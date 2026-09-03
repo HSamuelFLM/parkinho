@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Parkinho{% endblock %}</title>
+    <script>
+        // Aplica tema antes do paint para evitar flash
+        (function () {
+            try {
+                var t = localStorage.getItem('parquinho-theme');
+                if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/logo.svg') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="nav-brand">
+            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Parkinho" class="brand-logo">
+            <span class="brand-text">Park<span class="brand-accent">inho</span></span>
+        </a>
+        <button class="nav-toggle" id="navToggle" aria-label="Menu" type="button">☰</button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('entrada') }}">Entrada</a></li>
+            <li><a href="{{ url_for('buscar_saida') }}">Saída</a></li>
+            <li><a href="{{ url_for('listar_vagas') }}">Vagas</a></li>
+            <li><a href="{{ url_for('listar_veiculos') }}">Veículos</a></li>
+            <li><a href="{{ url_for('listar_clientes') }}">Clientes</a></li>
+            <li><a href="{{ url_for('listar_precos') }}">Preços</a></li>
+            <li><a href="{{ url_for('relatorios') }}">Relatórios</a></li>
+        </ul>
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar tema" title="Modo claro / escuro">
+            <span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span>
+            <span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span>
+        </button>
+    </nav>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <span>{{ message }}</span>
+                        <button type="button" class="alert-close" onclick="this.parentElement.remove()" aria-label="Fechar">×</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" class="footer-logo">
+        Parkinho — estacionamento com jeito de playground
+    </footer>
+
+    <script>
+        document.getElementById('navToggle')?.addEventListener('click', function () {
+            document.getElementById('navLinks').classList.toggle('open');
+        });
+
+        (function () {
+            var root = document.documentElement;
+            var btn = document.getElementById('themeToggle');
+
+            function isDark() {
+                return root.getAttribute('data-theme') === 'dark';
+            }
+
+            function setTheme(dark) {
+                if (dark) {
+                    root.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('parquinho-theme', 'dark');
+                } else {
+                    root.removeAttribute('data-theme');
+                    localStorage.setItem('parquinho-theme', 'light');
+                }
+            }
+
+            btn?.addEventListener('click', function () {
+                setTheme(!isDark());
+            });
+
+            // Destaca item ativo da navegação
+            var path = window.location.pathname.replace(/\/+$/, '') || '/';
+            document.querySelectorAll('.nav-links a').forEach(function (a) {
+                try {
+                    var href = new URL(a.href).pathname.replace(/\/+$/, '') || '/';
+                    if (href === path || (href !== '/' && path.indexOf(href) === 0)) {
+                        a.classList.add('nav-active');
+                    }
+                } catch (e) {}
+            });
+        })();
+    </script>
+</body>
+</html>

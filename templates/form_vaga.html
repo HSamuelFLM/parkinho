@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if vaga else 'Nova' }} vaga — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>{{ 'Editar' if vaga else 'Nova' }} vaga</h1>
+        <p class="page-subtitle">Código e tipo da vaga</p>
+    </div>
+    <a href="{{ url_for('listar_vagas') }}" class="btn">← Vagas</a>
+</div>
+
+<div class="panel panel-form">
+<form method="post" class="form form-wide">
+    <div class="form-row">
+        <div class="form-group">
+            <label for="codigo">Código *</label>
+            <input type="text" id="codigo" name="codigo" required maxlength="10" autofocus
+                   placeholder="Ex: N21, P06"
+                   value="{{ vaga.codigo if vaga else '' }}"
+                   style="text-transform: uppercase; font-weight: 600;">
+        </div>
+        <div class="form-group">
+            <label for="tipo">Tipo</label>
+            <select id="tipo" name="tipo">
+                {% set tipos = [('normal', 'Normal'), ('preferencial', 'Preferencial'), ('pcd', 'PCD'), ('eletrica', 'Elétrica')] %}
+                {% for val, label in tipos %}
+                <option value="{{ val }}" {% if vaga and vaga.tipo == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    {% if vaga %}
+    <div class="form-group">
+        <label>Status atual</label>
+        <p>
+            <span class="badge {% if vaga.status == 'livre' %}badge-pcd{% else %}badge-preferencial{% endif %}">{{ vaga.status }}</span>
+            <small class="hint">O status muda automaticamente na entrada e na saída.</small>
+        </p>
+    </div>
+    {% endif %}
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="{{ url_for('listar_vagas') }}" class="btn">Cancelar</a>
+    </div>
+</form>
+</div>
+{% endblock %}

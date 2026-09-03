@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Preços — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Tabela de preços</h1>
+        <p class="page-subtitle">Defina valores por hora, diária, mensal ou anual</p>
+    </div>
+    <a href="{{ url_for('novo_preco') }}" class="btn btn-primary">+ Novo preço</a>
+</div>
+
+<div class="panel">
+{% if precos %}
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                    <th>Cobrança</th>
+                    <th>Tipo veículo</th>
+                    <th>Valor</th>
+                    <th style="width:140px">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in precos %}
+                <tr>
+                    <td><strong>{{ p.descricao }}</strong></td>
+                    <td><span class="badge">{{ p.tipo_cobranca }}</span></td>
+                    <td>{{ p.tipo_veiculo }}</td>
+                    <td class="valor">R$ {{ '%.2f'|format(p.valor) }}</td>
+                    <td class="acoes">
+                        <a href="{{ url_for('editar_preco', id=p.id) }}" class="btn btn-sm">Editar</a>
+                        <form method="post" action="{{ url_for('excluir_preco', id=p.id) }}"
+                              onsubmit="return confirm('Excluir o preço \"{{ p.descricao }}\"?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <p>Nenhum preço cadastrado.</p>
+        <p class="muted">Cadastre pelo menos valores de <strong>hora</strong> (e opcionalmente diária) para o cálculo na saída.</p>
+        <a href="{{ url_for('novo_preco') }}" class="btn btn-primary">Cadastrar preço</a>
+    </div>
+{% endif %}
+</div>
+{% endblock %}

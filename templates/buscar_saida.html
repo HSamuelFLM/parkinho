@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Saída — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Registrar saída</h1>
+        <p class="page-subtitle">Busque pela placa ou selecione um veículo no pátio</p>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn">← Dashboard</a>
+</div>
+
+<div class="panel search-panel">
+    <form method="post" class="search-bar">
+        <input type="text" id="placa" name="placa" required maxlength="8"
+               class="input-placa"
+               placeholder="Digite a placa..." autofocus
+               value="{{ placa_busca }}"
+               autocomplete="off"
+               aria-label="Placa do veículo">
+        <button type="submit" class="btn btn-primary">Buscar e sair</button>
+    </form>
+</div>
+
+<div class="panel">
+    <div class="panel-head">
+        <h2 class="panel-title">Veículos no pátio</h2>
+    </div>
+    {% if ativos %}
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Placa</th>
+                    <th>Veículo</th>
+                    <th>Vaga</th>
+                    <th>Entrada</th>
+                    <th style="width:100px">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in ativos %}
+                <tr>
+                    <td><strong class="placa">{{ a.placa }}</strong></td>
+                    <td>{{ a.marca or '' }} {{ a.modelo or '' }}</td>
+                    <td>{{ a.vaga_codigo }}</td>
+                    <td>{{ a.entrada[11:16] }} <small class="muted">{{ a.entrada[:10] }}</small></td>
+                    <td>
+                        <a href="{{ url_for('saida', id=a.id) }}" class="btn btn-sm btn-danger">Saída</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>Nenhum veículo no pátio no momento.</p>
+        <a href="{{ url_for('entrada') }}" class="btn btn-primary">Registrar entrada</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.getElementById('placa').addEventListener('input', function (e) {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if preco else 'Novo' }} preço — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>{{ 'Editar' if preco else 'Novo' }} preço</h1>
+        <p class="page-subtitle">Configure cobrança e valor</p>
+    </div>
+    <a href="{{ url_for('listar_precos') }}" class="btn">← Preços</a>
+</div>
+
+<div class="panel panel-form">
+<form method="post" class="form form-wide">
+    <div class="form-group">
+        <label for="descricao">Descrição *</label>
+        <input type="text" id="descricao" name="descricao" required autofocus
+               placeholder="Ex: Hora - Carro"
+               value="{{ preco.descricao if preco else '' }}">
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="tipo_cobranca">Tipo de cobrança</label>
+            <select id="tipo_cobranca" name="tipo_cobranca">
+                {% for c in ['hora', 'diaria', 'mensal', 'anual'] %}
+                <option value="{{ c }}" {% if preco and preco.tipo_cobranca == c %}selected{% endif %}>{{ c|capitalize }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="tipo_veiculo">Tipo de veículo</label>
+            <select id="tipo_veiculo" name="tipo_veiculo">
+                {% for t in ['todos', 'carro', 'moto', 'caminhao', 'van'] %}
+                <option value="{{ t }}" {% if preco and preco.tipo_veiculo == t %}selected{% endif %}>{{ t|capitalize }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="valor">Valor (R$) *</label>
+        <input type="text" id="valor" name="valor" required placeholder="12.00"
+               value="{{ '%.2f'|format(preco.valor) if preco else '' }}">
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="{{ url_for('listar_precos') }}" class="btn">Cancelar</a>
+    </div>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if cliente else 'Novo' }} cliente — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>{{ 'Editar' if cliente else 'Novo' }} cliente</h1>
+        <p class="page-subtitle">Dados de identificação e contato</p>
+    </div>
+    <a href="{{ url_for('listar_clientes') }}" class="btn">← Clientes</a>
+</div>
+
+<div class="panel panel-form">
+<form method="post" class="form form-wide">
+    <div class="form-group">
+        <label for="nome">Nome *</label>
+        <input type="text" id="nome" name="nome" required autofocus
+               value="{{ cliente.nome if cliente else '' }}">
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="documento">CPF / CNPJ</label>
+            <input type="text" id="documento" name="documento" maxlength="18"
+                   placeholder="000.000.000-00"
+                   value="{{ cliente.documento if cliente else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="telefone">Telefone</label>
+            <input type="text" id="telefone" name="telefone" maxlength="15"
+                   placeholder="(00) 00000-0000"
+                   value="{{ cliente.telefone if cliente else '' }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email"
+               value="{{ cliente.email if cliente else '' }}">
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="{{ url_for('listar_clientes') }}" class="btn">Cancelar</a>
+    </div>
+</form>
+</div>
+
+<script>
+document.getElementById('documento').addEventListener('input', function (e) {
+    let v = e.target.value.replace(/\D/g, '');
+    if (v.length <= 11) {
+        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+        v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    } else {
+        v = v.substring(0, 14);
+        v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+        v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+        v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+        v = v.replace(/(\d{4})(\d)/, '$1-$2');
+    }
+    e.target.value = v;
+});
+document.getElementById('telefone').addEventListener('input', function (e) {
+    let v = e.target.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.substring(0, 11);
+    if (v.length > 0) v = '(' + v;
+    if (v.length > 3) v = v.substring(0, 3) + ') ' + v.substring(3);
+    if (v.length > 10) {
+        if (v.replace(/\D/g, '').length === 11) v = v.replace(/(\d{5})(\d{4})$/, '$1-$2');
+        else v = v.replace(/(\d{4})(\d{4})$/, '$1-$2');
+    }
+    e.target.value = v;
+});
+</script>
+{% endblock %}

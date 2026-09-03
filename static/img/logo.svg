@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Parkinho">
+  <!-- Fundo playground (círculo suave) -->
+  <circle cx="32" cy="32" r="30" fill="url(#bg)"/>
+
+  <!-- Arco de escorregador / pista curva (playground + circulação) -->
+  <path d="M14 42 C18 28, 28 18, 44 16" stroke="#fff" stroke-width="3.2" stroke-linecap="round" fill="none" opacity="0.9"/>
+  <path d="M44 16 L40 13 M44 16 L41 20" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Letra P estilizada (estacionamento) -->
+  <path d="M22 46 V20 H33.5 C39.5 20 43.5 23.8 43.5 29.5 C43.5 35.2 39.5 39 33.5 39 H28 V46 Z"
+        fill="#fff"/>
+  <path d="M28 26.5 V32.5 H32.8 C35.2 32.5 36.8 31.1 36.8 29.5 C36.8 27.9 35.2 26.5 32.8 26.5 H28 Z"
+        fill="url(#pInner)"/>
+
+  <!-- Carrinho divertido (base) -->
+  <ellipse cx="38" cy="47.5" rx="9" ry="3.2" fill="#1e3a5f" opacity="0.2"/>
+  <rect x="31" y="41" width="14" height="6.5" rx="2.2" fill="#FDE68A"/>
+  <path d="M34 41 L36.2 37.2 H41.5 L44 41 Z" fill="#FBBF24"/>
+  <circle cx="34.5" cy="47.5" r="1.7" fill="#1e293b"/>
+  <circle cx="42" cy="47.5" r="1.7" fill="#1e293b"/>
+  <!-- Janela -->
+  <rect x="36.5" y="38.2" width="3.2" height="2.2" rx="0.5" fill="#93C5FD"/>
+
+  <!-- Bolinha de playground -->
+  <circle cx="18" cy="48" r="3.2" fill="#F472B6"/>
+  <circle cx="17.2" cy="47.2" r="0.9" fill="#fff" opacity="0.5"/>
+
+  <defs>
+    <linearGradient id="bg" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="0.55" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="pInner" x1="28" y1="26" x2="37" y2="33" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#818CF8"/>
+      <stop offset="1" stop-color="#6366F1"/>
+    </linearGradient>
+  </defs>
+</svg>

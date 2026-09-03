@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Vagas — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Vagas</h1>
+        <p class="page-subtitle">{{ resumo.livres }} livres · {{ resumo.ocupadas }} ocupadas · {{ resumo.total }} no total</p>
+    </div>
+    <a href="{{ url_for('nova_vaga') }}" class="btn btn-primary">+ Nova vaga</a>
+</div>
+
+<div class="vaga-stats" aria-label="Resumo por tipo">
+    {% for t in por_tipo %}
+    <div class="vaga-stat">
+        <span class="badge badge-{{ t.tipo }}">{{ t.tipo }}</span>
+        <span class="vaga-stat-nums">
+            <strong class="ok">{{ t.livres }} livres</strong>
+            <span class="muted">·</span>
+            <span class="warn">{{ t.ocupadas }} ocup.</span>
+        </span>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="seg-control filter-seg" role="group" aria-label="Filtrar vagas">
+    <a href="{{ url_for('listar_vagas', filtro='todas') }}"
+       class="seg {% if filtro == 'todas' %}active{% endif %}">Todas</a>
+    <a href="{{ url_for('listar_vagas', filtro='livres') }}"
+       class="seg {% if filtro == 'livres' %}active{% endif %}">Livres</a>
+    <a href="{{ url_for('listar_vagas', filtro='ocupadas') }}"
+       class="seg {% if filtro == 'ocupadas' %}active{% endif %}">Ocupadas</a>
+</div>
+
+{% if grupos %}
+{% for tipo, lista in grupos.items() %}
+<section class="vaga-group panel">
+    <div class="vaga-group-head">
+        <div class="vaga-group-title">
+            <span class="badge badge-{{ tipo }}">{{ tipo }}</span>
+            <span class="muted">{{ lista|length }} vaga{{ 's' if lista|length != 1 else '' }}</span>
+        </div>
+    </div>
+    <div class="vaga-chips">
+        {% for v in lista %}
+        <div class="vaga-chip vaga-chip-{{ v.status }}"
+             title="{{ v.codigo }} — {{ v.status }}">
+            <span class="vaga-chip-code">{{ v.codigo }}</span>
+            <span class="vaga-chip-status">
+                {% if v.status == 'livre' %}Livre{% else %}Ocupada{% endif %}
+            </span>
+            <div class="vaga-chip-menu">
+                <a href="{{ url_for('editar_vaga', id=v.id) }}" class="btn btn-sm">Editar</a>
+                {% if v.status == 'livre' %}
+                <form method="post" action="{{ url_for('excluir_vaga', id=v.id) }}"
+                      onsubmit="return confirm('Excluir a vaga {{ v.codigo }}?');">
+                    <button type="submit" class="btn btn-sm btn-danger" aria-label="Excluir vaga {{ v.codigo }}">×</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endfor %}
+{% else %}
+<div class="panel">
+    <div class="empty-state">
+        <p>Nenhuma vaga neste filtro.</p>
+        <a href="{{ url_for('listar_vagas') }}" class="btn">Ver todas</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

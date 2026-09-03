@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Veículos — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Veículos</h1>
+        <p class="page-subtitle">Placas, modelos e vínculos com clientes</p>
+    </div>
+    <a href="{{ url_for('novo_veiculo') }}" class="btn btn-primary">+ Novo veículo</a>
+</div>
+
+<div class="panel search-panel">
+    <form method="get" class="search-bar">
+        <input type="text" id="q" name="q" placeholder="Buscar placa, marca ou modelo..."
+               value="{{ busca or '' }}" style="text-transform: uppercase;">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+        {% if busca %}
+        <a href="{{ url_for('listar_veiculos') }}" class="btn">Limpar</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="panel">
+{% if veiculos %}
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Placa</th>
+                    <th>Veículo</th>
+                    <th>Tipo</th>
+                    <th>Cliente</th>
+                    <th>Status</th>
+                    <th style="width:140px">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in veiculos %}
+                <tr>
+                    <td><strong class="placa">{{ v.placa }}</strong></td>
+                    <td>
+                        {{ v.marca or '' }} {{ v.modelo or '' }}
+                        <br><small class="muted">{{ v.cor or '—' }} · {{ v.tamanho }}{% if v.ano %} · {{ v.ano }}{% endif %}</small>
+                    </td>
+                    <td><span class="badge">{{ v.tipo }}</span></td>
+                    <td>{{ v.cliente_nome or '—' }}</td>
+                    <td>
+                        {% if v.no_patio %}
+                        <span class="badge badge-preferencial">No pátio</span>
+                        {% else %}
+                        <span class="badge badge-pcd">Livre</span>
+                        {% endif %}
+                    </td>
+                    <td class="acoes">
+                        <a href="{{ url_for('editar_veiculo', id=v.id) }}" class="btn btn-sm">Editar</a>
+                        {% if not v.no_patio %}
+                        <form method="post" action="{{ url_for('excluir_veiculo', id=v.id) }}"
+                              onsubmit="return confirm('Excluir o veículo {{ v.placa }}?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="empty-state">
+        {% if busca %}
+        <p>Nenhum veículo encontrado para "{{ busca }}".</p>
+        <a href="{{ url_for('listar_veiculos') }}" class="btn">Ver todos</a>
+        {% else %}
+        <p>Nenhum veículo cadastrado.</p>
+        <a href="{{ url_for('novo_veiculo') }}" class="btn btn-primary">Cadastrar veículo</a>
+        {% endif %}
+    </div>
+{% endif %}
+</div>
+{% endblock %}

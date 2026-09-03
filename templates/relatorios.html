@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}Relatórios — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Relatórios</h1>
+        <p class="page-subtitle">{{ periodo_label }}</p>
+    </div>
+</div>
+
+<!-- Filtros integrados -->
+<div class="panel filters-panel">
+    <div class="filters-row">
+        <div class="seg-control" role="group" aria-label="Período">
+            <a href="{{ url_for('relatorios', periodo='hoje') }}"
+               class="seg {% if periodo == 'hoje' %}active{% endif %}">Hoje</a>
+            <a href="{{ url_for('relatorios', periodo='7dias') }}"
+               class="seg {% if periodo == '7dias' %}active{% endif %}">7 dias</a>
+            <a href="{{ url_for('relatorios', periodo='30dias') }}"
+               class="seg {% if periodo == '30dias' %}active{% endif %}">30 dias</a>
+            <a href="{{ url_for('relatorios', periodo='mes') }}"
+               class="seg {% if periodo == 'mes' %}active{% endif %}">Este mês</a>
+            <a href="{{ url_for('relatorios', periodo='tudo') }}"
+               class="seg {% if periodo == 'tudo' %}active{% endif %}">Tudo</a>
+        </div>
+
+        <form method="get" class="filter-custom">
+            <span class="filter-label">Período</span>
+            <input type="date" name="data_ini" value="{{ data_ini }}">
+            <span class="muted">—</span>
+            <input type="date" name="data_fim" value="{{ data_fim }}">
+            <input type="hidden" name="periodo" value="custom">
+            <button type="submit" class="btn btn-primary btn-sm">Aplicar</button>
+        </form>
+    </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-grid">
+    <div class="kpi kpi-receita">
+        <div class="kpi-label">Receita</div>
+        <div class="kpi-value">R$ {{ '%.2f'|format(kpis.receita)|replace('.', ',') }}</div>
+        <div class="kpi-hint">no período</div>
+    </div>
+    <div class="kpi kpi-saidas">
+        <div class="kpi-label">Saídas</div>
+        <div class="kpi-value">{{ kpis.qtd_saidas }}</div>
+        <div class="kpi-hint">finalizadas</div>
+    </div>
+    <div class="kpi kpi-ticket">
+        <div class="kpi-label">Ticket médio</div>
+        <div class="kpi-value">R$ {{ '%.2f'|format(kpis.ticket_medio)|replace('.', ',') }}</div>
+        <div class="kpi-hint">por saída</div>
+    </div>
+    <div class="kpi kpi-maior">
+        <div class="kpi-label">Maior ticket</div>
+        <div class="kpi-value">R$ {{ '%.2f'|format(kpis.maior_ticket)|replace('.', ',') }}</div>
+        <div class="kpi-hint">no período</div>
+    </div>
+    <div class="kpi kpi-ocupacao">
+        <div class="kpi-label">Ocupação agora</div>
+        <div class="kpi-value">{{ no_patio }}<span class="kpi-suffix">/{{ total_vagas }}</span></div>
+        <div class="kpi-hint">{{ ocupacao }}% do pátio</div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <section class="panel">
+        <h2 class="panel-title">Receita por dia</h2>
+        {% if por_dia %}
+        <div class="bar-chart">
+            {% for d in por_dia %}
+            <div class="bar-row">
+                <span class="bar-label">{{ d.dia[8:10] }}/{{ d.dia[5:7] }}</span>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width: {{ (d.total / max_dia * 100)|round(1) }}%"></div>
+                </div>
+                <span class="bar-value">R$ {{ '%.0f'|format(d.total) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty compact">Sem dados no período.</p>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2 class="panel-title">Por tipo de vaga</h2>
+        {% if por_tipo %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Qtd</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in por_tipo %}
+                <tr>
+                    <td><span class="badge badge-{{ p.tipo }}">{{ p.tipo }}</span></td>
+                    <td>{{ p.qtd }}</td>
+                    <td class="valor">R$ {{ '%.2f'|format(p.total) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty compact">Sem dados no período.</p>
+        {% endif %}
+    </section>
+</div>
+
+<div class="grid-2" style="margin-top: 1.25rem;">
+    <section class="panel">
+        <h2 class="panel-title">Por tipo de veículo</h2>
+        {% if por_veiculo %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Qtd</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in por_veiculo %}
+                <tr>
+                    <td><span class="badge">{{ p.tipo }}</span></td>
+                    <td>{{ p.qtd }}</td>
+                    <td class="valor">R$ {{ '%.2f'|format(p.total) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty compact">Sem dados no período.</p>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2 class="panel-title">Resumo do período</h2>
+        <div class="summary-list">
+            <div class="summary-item">
+                <span>Período</span>
+                <strong>{{ periodo_label }}</strong>
+            </div>
+            <div class="summary-item">
+                <span>Total de saídas</span>
+                <strong>{{ kpis.qtd_saidas }}</strong>
+            </div>
+            <div class="summary-item">
+                <span>Receita</span>
+                <strong class="valor">R$ {{ '%.2f'|format(kpis.receita) }}</strong>
+            </div>
+            <div class="summary-item">
+                <span>Ticket médio</span>
+                <strong>R$ {{ '%.2f'|format(kpis.ticket_medio) }}</strong>
+            </div>
+            <div class="summary-item">
+                <span>Ocupação atual</span>
+                <strong>{{ ocupacao }}% ({{ no_patio }} de {{ total_vagas }})</strong>
+            </div>
+        </div>
+    </section>
+</div>
+
+<section class="section">
+    <div class="section-header">
+        <h2>Histórico de saídas</h2>
+        <span class="muted">{{ historico|length }} registro(s)</span>
+    </div>
+    {% if historico %}
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Placa</th>
+                    <th>Veículo</th>
+                    <th>Vaga</th>
+                    <th>Entrada</th>
+                    <th>Saída</th>
+                    <th>Valor</th>
+                    <th>Obs.</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in historico %}
+                <tr>
+                    <td><strong class="placa">{{ h.placa }}</strong></td>
+                    <td>
+                        {{ h.marca or '' }} {{ h.modelo or '' }}
+                        <br><small class="muted">{{ h.tipo_veiculo or '' }}</small>
+                    </td>
+                    <td><span class="badge badge-{{ h.vaga_tipo }}">{{ h.vaga_codigo }}</span></td>
+                    <td>{{ h.entrada[:16].replace('T', ' ') if h.entrada else '—' }}</td>
+                    <td>{{ h.saida[:16].replace('T', ' ') if h.saida else '—' }}</td>
+                    <td class="valor">R$ {{ '%.2f'|format(h.valor_total or 0) }}</td>
+                    <td><small class="muted">{{ h.observacao or '—' }}</small></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty">Nenhuma saída neste período.</p>
+    {% endif %}
+</section>
+{% endblock %}

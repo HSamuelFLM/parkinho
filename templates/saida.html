@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Confirmar Saída — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Confirmar saída</h1>
+        <p class="page-subtitle">Revise a sessão e confirme a cobrança</p>
+    </div>
+    <a href="{{ url_for('buscar_saida') }}" class="btn">← Voltar</a>
+</div>
+
+<div class="saida-layout">
+    <div class="info-box">
+        <p class="info-kicker">Placa</p>
+        <div class="info-placa">{{ est.placa }}</div>
+
+        <div class="info-grid">
+            <div>
+                <span class="info-label">Veículo</span>
+                <span class="info-value">{{ est.marca or '—' }} {{ est.modelo or '' }}{% if est.cor %} · {{ est.cor }}{% endif %}</span>
+            </div>
+            <div>
+                <span class="info-label">Vaga</span>
+                <span class="info-value">
+                    {{ est.vaga_codigo }}
+                    <span class="badge badge-{{ est.vaga_tipo }}">{{ est.vaga_tipo }}</span>
+                </span>
+            </div>
+            <div>
+                <span class="info-label">Entrada</span>
+                <span class="info-value">{{ est.entrada[:16].replace('T', ' ') }}</span>
+            </div>
+            <div>
+                <span class="info-label">Tempo estacionado</span>
+                <span class="info-value info-value-emphasis">{{ horas }}h {{ minutos }}min</span>
+            </div>
+        </div>
+
+        <div class="valor-box">
+            <span class="info-label">Valor calculado</span>
+            <span class="valor-destaque" id="valorCalculadoLabel">R$ {{ '%.2f'|format(valor_atual) }}</span>
+        </div>
+    </div>
+
+    <form method="post" class="form form-saida panel" id="formSaida">
+        <h2 class="panel-title">Cobrança</h2>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="valor">Valor (R$)</label>
+                <input type="text" id="valor" name="valor"
+                       value="{{ '%.2f'|format(valor_atual) }}"
+                       inputmode="decimal">
+                <small>Pode ajustar se necessário</small>
+            </div>
+            <div class="form-group">
+                <label for="desconto">Desconto (%)</label>
+                <input type="text" id="desconto" name="desconto" value="0"
+                       inputmode="decimal" placeholder="0">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="forma_pagamento">Forma de pagamento</label>
+            <select id="forma_pagamento" name="forma_pagamento">
+                <option value="dinheiro">Dinheiro</option>
+                <option value="pix">PIX</option>
+                <option value="cartao_debito">Cartão débito</option>
+                <option value="cartao_credito">Cartão crédito</option>
+                <option value="cortesia">Cortesia / Isento</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="observacao">Observação <span class="label-optional">(opcional)</span></label>
+            <input type="text" id="observacao" name="observacao"
+                   placeholder="Ex.: mensalista, promoção…">
+        </div>
+
+        <div class="total-box" role="status" aria-live="polite">
+            <span>Total a cobrar</span>
+            <strong id="totalFinal">R$ {{ '%.2f'|format(valor_atual) }}</strong>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger btn-lg">Confirmar saída</button>
+            <a href="{{ url_for('buscar_saida') }}" class="btn">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+(function () {
+    const valorInput = document.getElementById('valor');
+    const descontoInput = document.getElementById('desconto');
+    const totalEl = document.getElementById('totalFinal');
+    const pagamento = document.getElementById('forma_pagamento');
+
+    function parseNum(str) {
+        const n = parseFloat(String(str).replace(',', '.'));
+        return isNaN(n) ? 0 : n;
+    }
+
+    function atualizarTotal() {
+        let valor = parseNum(valorInput.value);
+        let desconto = parseNum(descontoInput.value);
+        if (desconto < 0) desconto = 0;
+        if (desconto > 100) desconto = 100;
+
+        if (pagamento.value === 'cortesia') {
+            totalEl.textContent = 'R$ 0,00';
+            return;
+        }
+
+        const total = valor * (1 - desconto / 100);
+        totalEl.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+    }
+
+    valorInput.addEventListener('input', atualizarTotal);
+    descontoInput.addEventListener('input', atualizarTotal);
+    pagamento.addEventListener('change', function () {
+        if (pagamento.value === 'cortesia') {
+            descontoInput.value = '100';
+        }
+        atualizarTotal();
+    });
+})();
+</script>
+{% endblock %}

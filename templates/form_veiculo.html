@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if veiculo else 'Novo' }} veículo — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>{{ 'Editar' if veiculo else 'Novo' }} veículo</h1>
+        <p class="page-subtitle">Placa e dados do veículo</p>
+    </div>
+    <a href="{{ url_for('listar_veiculos') }}" class="btn">← Veículos</a>
+</div>
+
+<div class="panel panel-form">
+<form method="post" class="form form-wide">
+    <div class="form-row">
+        <div class="form-group">
+            <label for="placa">Placa *</label>
+            <input type="text" id="placa" name="placa" required maxlength="8" autofocus
+                   placeholder="ABC1D23"
+                   value="{{ veiculo.placa if veiculo else '' }}"
+                   style="text-transform: uppercase; font-weight: 600; letter-spacing: 0.06em;">
+        </div>
+        <div class="form-group">
+            <label for="cliente_id">Cliente (opcional)</label>
+            <select id="cliente_id" name="cliente_id">
+                <option value="">— Sem cliente —</option>
+                {% for c in clientes %}
+                <option value="{{ c.id }}" {% if veiculo and veiculo.cliente_id == c.id %}selected{% endif %}>{{ c.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="marca">Marca</label>
+            <input type="text" id="marca" name="marca" value="{{ veiculo.marca if veiculo else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="modelo">Modelo</label>
+            <input type="text" id="modelo" name="modelo" value="{{ veiculo.modelo if veiculo else '' }}">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="cor">Cor</label>
+            <input type="text" id="cor" name="cor" value="{{ veiculo.cor if veiculo else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="ano">Ano</label>
+            <input type="number" id="ano" name="ano" min="1900" max="2030" value="{{ veiculo.ano if veiculo else '' }}">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="tipo">Tipo</label>
+            <select id="tipo" name="tipo">
+                {% for t in ['carro', 'moto', 'caminhao', 'van'] %}
+                <option value="{{ t }}" {% if veiculo and veiculo.tipo == t %}selected{% endif %}>{{ t|capitalize }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="tamanho">Tamanho</label>
+            <select id="tamanho" name="tamanho">
+                {% for t in ['pequeno', 'medio', 'grande'] %}
+                <option value="{{ t }}" {% if veiculo and veiculo.tamanho == t %}selected{% endif %}>{{ t|capitalize }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="{{ url_for('listar_veiculos') }}" class="btn">Cancelar</a>
+    </div>
+</form>
+</div>
+<script>
+document.getElementById('placa').addEventListener('input', function (e) {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Clientes — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Clientes</h1>
+        <p class="page-subtitle">Cadastro e gestão de clientes</p>
+    </div>
+    <a href="{{ url_for('novo_cliente') }}" class="btn btn-primary">+ Novo cliente</a>
+</div>
+
+<div class="panel">
+{% if clientes %}
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Documento</th>
+                    <th>Telefone</th>
+                    <th>E-mail</th>
+                    <th style="width:140px">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in clientes %}
+                <tr>
+                    <td><strong>{{ c.nome }}</strong></td>
+                    <td>{{ c.documento or '—' }}</td>
+                    <td>{{ c.telefone or '—' }}</td>
+                    <td>{{ c.email or '—' }}</td>
+                    <td class="acoes">
+                        <a href="{{ url_for('editar_cliente', id=c.id) }}" class="btn btn-sm">Editar</a>
+                        <form method="post" action="{{ url_for('excluir_cliente', id=c.id) }}"
+                              onsubmit="return confirm('Excluir o cliente {{ c.nome }}?\nVeículos vinculados ficarão sem cliente.');">
+                            <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <p>Nenhum cliente cadastrado ainda.</p>
+        <a href="{{ url_for('novo_cliente') }}" class="btn btn-primary">Cadastrar primeiro cliente</a>
+    </div>
+{% endif %}
+</div>
+{% endblock %}

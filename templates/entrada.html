@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Entrada — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Registrar entrada</h1>
+        <p class="page-subtitle">Placa → veículo → vaga → confirmação</p>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn">← Voltar</a>
+</div>
+
+<div class="panel panel-form">
+    <form method="post" class="form form-wide">
+        <div class="step-block">
+            <span class="step-num" aria-hidden="true">1</span>
+            <div class="step-body">
+                <p class="step-title">Placa</p>
+                <div class="form-group">
+                    <label for="placa_avulsa">Placa do veículo</label>
+                    <input type="text" id="placa_avulsa" name="placa_avulsa" maxlength="8"
+                           class="input-placa"
+                           placeholder="ABC1D23" autofocus
+                           autocomplete="off"
+                           aria-describedby="placa-hint">
+                    <small id="placa-hint">Se a placa não existir, o veículo será cadastrado automaticamente.</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-block">
+            <span class="step-num" aria-hidden="true">2</span>
+            <div class="step-body">
+                <p class="step-title">Veículo (opcional)</p>
+                <div class="form-group">
+                    <label for="veiculo_id">Selecionar cadastro existente</label>
+                    <select id="veiculo_id" name="veiculo_id">
+                        <option value="">— Usar apenas a placa acima —</option>
+                        {% for v in veiculos %}
+                        <option value="{{ v.id }}">{{ v.placa }} — {{ v.marca or '' }} {{ v.modelo or '' }}</option>
+                        {% endfor %}
+                    </select>
+                    <small>Use isto se o veículo já estiver cadastrado com modelo e cliente.</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-block">
+            <span class="step-num" aria-hidden="true">3</span>
+            <div class="step-body">
+                <p class="step-title">Vaga</p>
+                <div class="form-group">
+                    <label for="vaga_id">Vaga livre</label>
+                    <select id="vaga_id" name="vaga_id" required>
+                        <option value="">— Selecione a vaga —</option>
+                        {% for v in vagas_livres %}
+                        <option value="{{ v.id }}">{{ v.codigo }} · {{ v.tipo }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if not vagas_livres %}
+                    <small class="text-warn">Nenhuma vaga livre no momento.</small>
+                    {% else %}
+                    <small>{{ vagas_livres|length }} vaga(s) disponível(is)</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg" {% if not vagas_livres %}disabled{% endif %}>
+                Confirmar entrada
+            </button>
+            <a href="{{ url_for('index') }}" class="btn">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('placa_avulsa').addEventListener('input', function (e) {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+});
+</script>
+{% endblock %}

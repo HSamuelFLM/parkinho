@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Parkinho{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Dashboard</h1>
+        <p class="page-subtitle">Operação do pátio em tempo real</p>
+    </div>
+    <div class="header-actions">
+        <a href="{{ url_for('entrada') }}" class="btn btn-primary">+ Entrada</a>
+        <a href="{{ url_for('buscar_saida') }}" class="btn btn-danger">Saída</a>
+    </div>
+</div>
+
+<div class="cards">
+    <div class="card card-green">
+        <div class="card-icon">✓</div>
+        <div class="card-body">
+            <div class="card-value">{{ stats.vagas_livres }}</div>
+            <div class="card-label">Vagas Livres</div>
+        </div>
+    </div>
+    <div class="card card-red">
+        <div class="card-icon">●</div>
+        <div class="card-body">
+            <div class="card-value">{{ stats.vagas_ocupadas }}</div>
+            <div class="card-label">Vagas Ocupadas</div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-icon">⊞</div>
+        <div class="card-body">
+            <div class="card-value">{{ stats.total_vagas }}</div>
+            <div class="card-label">Total de Vagas</div>
+        </div>
+    </div>
+    <div class="card card-blue">
+        <div class="card-icon">P</div>
+        <div class="card-body">
+            <div class="card-value">{{ stats.ativos }}</div>
+            <div class="card-label">No Pátio</div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-icon">C</div>
+        <div class="card-body">
+            <div class="card-value">{{ stats.clientes }}</div>
+            <div class="card-label">Clientes</div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-icon">V</div>
+        <div class="card-body">
+            <div class="card-value">{{ stats.veiculos }}</div>
+            <div class="card-label">Veículos</div>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <section class="panel">
+        <h2 class="panel-title">Vagas por tipo</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Livres</th>
+                    <th>Ocupadas</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in vagas_resumo %}
+                <tr>
+                    <td><span class="badge badge-{{ v.tipo }}">{{ v.tipo }}</span></td>
+                    <td class="ok">{{ v.livres }}</td>
+                    <td class="warn">{{ v.ocupadas }}</td>
+                    <td>{{ v.total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel">
+        <div class="panel-head">
+            <h2 class="panel-title">No pátio agora</h2>
+        </div>
+        {% if ativos %}
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Placa</th>
+                        <th>Vaga</th>
+                        <th>Entrada</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in ativos %}
+                    <tr>
+                        <td>
+                            <strong class="placa">{{ a.placa }}</strong>
+                            <br><small class="muted">{{ a.marca or '' }} {{ a.modelo or '' }}</small>
+                        </td>
+                        <td><span class="badge badge-{{ a.vaga_tipo }}">{{ a.vaga_codigo }}</span></td>
+                        <td>{{ a.entrada[11:16] }}</td>
+                        <td>
+                            <a href="{{ url_for('saida', id=a.id) }}" class="btn btn-sm btn-danger">Saída</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state compact">
+            <p>Nenhum veículo no pátio.</p>
+            <a href="{{ url_for('entrada') }}" class="btn btn-primary btn-sm">Registrar entrada</a>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
